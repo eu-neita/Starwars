@@ -18,6 +18,7 @@ function Table() {
     <div>
       <label htmlFor="search">Pesquisar:</label>
       <input
+        data-testid="name-filter"
         type="text"
         name="search"
         id="search"

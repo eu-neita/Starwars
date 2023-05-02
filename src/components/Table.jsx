@@ -2,7 +2,7 @@ import { useContext, useState } from 'react';
 import { ResidentsContext } from '../context/residentsContext';
 
 function Table() {
-  const { data } = useContext(ResidentsContext);
+  const { planetsData } = useContext(ResidentsContext);
   const [handleInputs, setHandle] = useState({
     search: '',
   });
@@ -26,7 +26,7 @@ function Table() {
         onChange={ inputChange }
         placeholder="Pesquisar"
       />
-      {data.length === 0 ? <span>carregando...</span> : (
+      {planetsData.length === 0 ? <span>carregando...</span> : (
         <table>
           <thead>
             <tr>
@@ -46,7 +46,7 @@ function Table() {
             </tr>
           </thead>
           <tbody>
-            { data.results
+            { planetsData.results
               .filter((item) => item.name.toLowerCase().includes(handleInputs.search))
               .map((planet) => (
                 <tr key={ planet.name }>

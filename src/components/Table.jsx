@@ -27,15 +27,14 @@ function Table() {
     const { filterCompare, columSelect, filterValue } = handleInputs;
     switch (filterCompare) {
     case 'maior que':
-      return (setDataFilter(planetsData.results
+      return (setDataFilter(dataFilter
         .filter((plan) => Number(plan[columSelect]) > Number(filterValue))));
     case 'menor que':
-      return (setDataFilter(planetsData.results
+      return (setDataFilter(dataFilter
         .filter((plan) => Number(plan[columSelect]) < Number(filterValue))));
     case 'igual a':
-      return (setDataFilter(planetsData.results
+      return (setDataFilter(dataFilter
         .filter((plan) => Number(plan[columSelect]) === Number(filterValue))));
-
     default:
       break;
     }

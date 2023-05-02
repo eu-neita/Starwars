@@ -1,10 +1,30 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { ResidentsContext } from '../context/residentsContext';
 
 function Table() {
   const { data } = useContext(ResidentsContext);
+  const [handleInputs, setHandle] = useState({
+    search: '',
+  });
+  const inputChange = ({ target }) => {
+    const { value, name } = target;
+
+    setHandle((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
   return (
     <div>
+      <label htmlFor="search">Pesquisar:</label>
+      <input
+        type="text"
+        name="search"
+        id="search"
+        value={ handleInputs.search }
+        onChange={ inputChange }
+        placeholder="Pesquisar"
+      />
       {data.length === 0 ? <span>carregando...</span> : (
         <table>
           <thead>
@@ -26,6 +46,7 @@ function Table() {
           </thead>
           <tbody>
             { data.results
+              .filter((item) => item.name.toLowerCase().includes(handleInputs.search))
               .map((planet) => (
                 <tr key={ planet.name }>
                   <td>{planet.name}</td>

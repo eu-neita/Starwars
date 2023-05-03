@@ -2,7 +2,8 @@ import { useContext, useEffect, useState } from 'react';
 import { ResidentsContext } from '../context/residentsContext';
 
 function Table() {
-  const { planetsData } = useContext(ResidentsContext);
+  const { planetsData, dataFiltredParam,
+    setdataFiltredParam } = useContext(ResidentsContext);
   const [handleInputs, setHandle] = useState({
     search: '',
     filterValue: 0,
@@ -16,30 +17,42 @@ function Table() {
       [name]: value,
     }));
   };
-  const [dataFilter, setDataFilter] = useState([]);
+  const [planetsFiltered, setPlanetsFiltered] = useState([]);
   useEffect(() => {
-    if (planetsData.length !== 0) {
-      setDataFilter(planetsData.results);
-    }
-  }, [planetsData.length, planetsData.results]);
+    setPlanetsFiltered([...planetsData]);
+  }, [planetsData]);
+
+  const funcFilter = (filterCompare, columSelect, filterValue) => {
+    const filteredData = planetsFiltered.filter((plan) => {
+      switch (filterCompare) {
+      case 'maior que':
+        return Number(plan[columSelect]) > Number(filterValue);
+      case 'menor que':
+        return Number(plan[columSelect]) < Number(filterValue);
+      case 'igual a':
+        return Number(plan[columSelect]) === Number(filterValue);
+      default:
+        return 0;
+      }
+    });
+    setPlanetsFiltered(filteredData.length === 0 ? [...planetsData] : [...filteredData]);
+  };
 
   const handleOparatorFilter = () => {
     const { filterCompare, columSelect, filterValue } = handleInputs;
-    switch (filterCompare) {
-    case 'maior que':
-      return (setDataFilter(planetsData.results
-        .filter((plan) => Number(plan[columSelect]) > Number(filterValue))));
-    case 'menor que':
-      return (setDataFilter(planetsData.results
-        .filter((plan) => Number(plan[columSelect]) < Number(filterValue))));
-    case 'igual a':
-      return (setDataFilter(planetsData.results
-        .filter((plan) => Number(plan[columSelect]) === Number(filterValue))));
-
-    default:
-      break;
-    }
+    setdataFiltredParam((prev) => [
+      ...prev,
+      {
+        filterCompare,
+        columSelect,
+        filterValue,
+      },
+    ]);
+    funcFilter(filterCompare, columSelect, filterValue);
   };
+  useEffect(() => {
+    console.log(dataFiltredParam);
+  }, [dataFiltredParam]);
   return (
     <div>
       <label htmlFor="search">Pesquisar:</label>
@@ -60,11 +73,16 @@ function Table() {
         value={ handleInputs.columSelect }
         onChange={ inputChange }
       >
-        <option value="population">population</option>
-        <option value="orbital_period">orbital_period</option>
-        <option value="diameter">diameter</option>
-        <option value="rotation_period">rotation_period</option>
-        <option value="surface_water">surface_water</option>
+        {!dataFiltredParam.some((it) => it.columSelect === 'population')
+           && <option value="population">population</option>}
+        {!dataFiltredParam.some((it) => it.columSelect === 'orbital_period')
+           && <option value="orbital_period">orbital_period</option>}
+        {!dataFiltredParam.some((it) => it.columSelect === 'diameter')
+           && <option value="diameter">diameter</option>}
+        {!dataFiltredParam.some((it) => it.columSelect === 'rotation_period')
+           && <option value="rotation_period">rotation_period</option>}
+        {!dataFiltredParam.some((it) => it.columSelect === 'surface_water')
+           && <option value="surface_water">surface_water</option>}
       </select>
 
       <label htmlFor="valueFilter">Valor:</label>
@@ -96,6 +114,19 @@ function Table() {
       >
         Aplicar
       </button>
+      {dataFiltredParam && dataFiltredParam.map((e) => (
+        <div key={ e.filterCompare }>
+          <span>{`${e.columSelect} ${e.filterCompare} ${e.filterValue}`}</span>
+          <button
+            onClick={ () => {
+              setdataFiltredParam(dataFiltredParam.filter((d) => e
+                .columSelect !== d.columSelect));
+            } }
+          >
+            Remove
+          </button>
+        </div>
+      ))}
       {planetsData.length === 0 ? <span>carregando...</span> : (
         <table>
           <thead>
@@ -116,7 +147,7 @@ function Table() {
             </tr>
           </thead>
           <tbody>
-            { dataFilter
+            { planetsFiltered
               .filter((item) => item.name.toLowerCase().includes(handleInputs.search))
               .map((planet) => (
                 <tr key={ planet.name }>

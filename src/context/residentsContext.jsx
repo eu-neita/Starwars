@@ -5,13 +5,14 @@ export const ResidentsContext = createContext();
 
 export default function ResidentsProvider({ children }) {
   const [planetsData, setPlanetsData] = useState([]);
+  const [dataFiltredParam, setdataFiltredParam] = useState([]);
 
   useEffect(() => {
     const dataPanets = async () => {
       const URL = 'https://swapi.dev/api/planets';
       const fetchData = await fetch(URL);
       const data = await fetchData.json();
-      setPlanetsData(data);
+      setPlanetsData(data.results);
       return data;
     };
     dataPanets();
@@ -19,8 +20,10 @@ export default function ResidentsProvider({ children }) {
 
   const context = useMemo(() => ({
     planetsData,
-
-  }), [planetsData]);
+    setPlanetsData,
+    dataFiltredParam,
+    setdataFiltredParam,
+  }), [dataFiltredParam, planetsData]);
 
   return (
     <ResidentsContext.Provider value={ context }>

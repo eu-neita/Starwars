@@ -17,28 +17,61 @@ function Table() {
     }));
   };
   const [dataFilter, setDataFilter] = useState([]);
+  const [dataObject, setDataObject] = useState([]);
   useEffect(() => {
     if (planetsData.length !== 0) {
       setDataFilter(planetsData.results);
     }
-  }, [planetsData.length, planetsData.results]);
 
+    dataObject.forEach((obj) => {
+      let filteredData;
+      switch (obj.filterCompare) {
+      case 'maior que':
+        filteredData = dataFilter.filter(
+          (plan) => Number(plan[obj.columSelect]) > Number(obj.filterValue),
+        );
+        break;
+      case 'menor que':
+        filteredData = dataFilter.filter(
+          (plan) => Number(plan[obj.columSelect]) < Number(obj.filterValue),
+        );
+        break;
+      case 'igual a':
+        filteredData = dataFilter.filter(
+          (plan) => Number(plan[obj.columSelect]) === Number(obj.filterValue),
+        );
+        break;
+      default:
+        break;
+      }
+      setDataFilter(filteredData);
+    });
+  }, [dataFilter, dataObject, planetsData.length, planetsData.results]);
+  const [columIsTrue, setColumIsTrue] = useState({
+    population: false,
+    orbital_period: false,
+    diameter: false,
+    rotation_period: false,
+    surface_water: false,
+  });
+  console.log(dataObject);
   const handleOparatorFilter = () => {
     const { filterCompare, columSelect, filterValue } = handleInputs;
-    switch (filterCompare) {
-    case 'maior que':
-      return (setDataFilter(dataFilter
-        .filter((plan) => Number(plan[columSelect]) > Number(filterValue))));
-    case 'menor que':
-      return (setDataFilter(dataFilter
-        .filter((plan) => Number(plan[columSelect]) < Number(filterValue))));
-    case 'igual a':
-      return (setDataFilter(dataFilter
-        .filter((plan) => Number(plan[columSelect]) === Number(filterValue))));
-    default:
-      break;
-    }
+    setColumIsTrue((prev) => ({
+      ...prev,
+      [columSelect]: true,
+    }));
+    setDataObject((prev) => {
+      const magicNumber = -1;
+      const index = prev.findIndex((obj) => obj.columSelect === columSelect);
+      if (index !== magicNumber) {
+        prev[index] = { filterCompare, columSelect, filterValue };
+        return [...prev];
+      }
+      return [...prev, { filterCompare, columSelect, filterValue }];
+    });
   };
+
   return (
     <div>
       <label htmlFor="search">Pesquisar:</label>
@@ -57,13 +90,17 @@ function Table() {
         data-testid="column-filter"
         id="columSelect"
         value={ handleInputs.columSelect }
-        onChange={ inputChange }
+        onClick={ inputChange }
       >
-        <option value="population">population</option>
-        <option value="orbital_period">orbital_period</option>
-        <option value="diameter">diameter</option>
-        <option value="rotation_period">rotation_period</option>
-        <option value="surface_water">surface_water</option>
+        {!columIsTrue.population && <option value="population">population</option>}
+        {!columIsTrue.orbital_period
+        && <option value="orbital_period">orbital_period</option>}
+        {!columIsTrue.diameter
+        && <option value="diameter">diameter</option>}
+        {!columIsTrue.rotation_period
+        && <option value="rotation_period">rotation_period</option>}
+        {!columIsTrue.surface_water
+        && <option value="surface_water">surface_water</option>}
       </select>
 
       <label htmlFor="valueFilter">Valor:</label>
@@ -95,6 +132,30 @@ function Table() {
       >
         Aplicar
       </button>
+      {dataObject.length !== 0 && dataObject.map((filters, i) => (
+        <div key={ i } data-testid="filter">
+          <span>
+            {filters.columSelect}
+            {' '}
+            {filters.filterCompare}
+            {' '}
+            {filters.filterValue}
+          </span>
+          <button
+            onClick={ () => {
+              setDataObject(dataObject.filter((f) => filters
+                .columSelect !== f.columSelect));
+              setColumIsTrue((prev) => ({
+                ...prev,
+                [filters.columSelect]: false,
+              }));
+            } }
+          >
+            Remover
+
+          </button>
+        </div>
+      )) }
       {planetsData.length === 0 ? <span>carregando...</span> : (
         <table>
           <thead>

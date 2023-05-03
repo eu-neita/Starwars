@@ -2,7 +2,8 @@ import { useContext, useEffect, useState } from 'react';
 import { ResidentsContext } from '../context/residentsContext';
 
 function Table() {
-  const { planetsData } = useContext(ResidentsContext);
+  const { planetsData, optionsOnSelected,
+    setOptionsOnSelected } = useContext(ResidentsContext);
   const [handleInputs, setHandle] = useState({
     search: '',
     filterValue: 0,
@@ -16,10 +17,8 @@ function Table() {
       [name]: value,
     }));
   };
+
   const [dataFilter, setDataFilter] = useState([]);
-  const [optionsOnSelected, setOptionsOnSelected] = useState(['population',
-    'orbital_period',
-    'diameter', 'rotation_period', 'surface_water']);
   const [filtersParam, setFiltersParam] = useState([]);
 
   useEffect(() => {
@@ -39,27 +38,52 @@ function Table() {
     switch (filterCompare) {
     case 'maior que':
       return (setFiltersParam(
-        [...filtersParam, { columSelect, filterCompare, filterValue }]
+        [...filtersParam, { columSelect, filterCompare, filterValue }],
       ),
       setDataFilter(dataFilter
         .filter((plan) => Number(plan[columSelect]) > Number(filterValue))));
     case 'menor que':
       return (setFiltersParam(
-        [...filtersParam, { columSelect, filterCompare, filterValue }]
+        [...filtersParam, { columSelect, filterCompare, filterValue }],
       ),
       setDataFilter(dataFilter
         .filter((plan) => Number(plan[columSelect]) < Number(filterValue))));
     case 'igual a':
       return (setFiltersParam(
-        [...filtersParam, { columSelect, filterCompare, filterValue }]
+        [...filtersParam, { columSelect, filterCompare, filterValue }],
       ),
       setDataFilter(dataFilter
         .filter((plan) => Number(plan[columSelect]) === Number(filterValue))));
-
     default:
       break;
     }
   };
+
+  const handleRemoveFilter = (column) => {
+    const removeFilter = filtersParam.filter((item) => item.columSelect !== column);
+    setFiltersParam([...removeFilter]);
+    optionsOnSelected.push(column);
+    let newDataFilter = [...planetsData];
+    removeFilter.forEach((filter) => {
+      if (filter.filterCompare === 'maior que') {
+        newDataFilter = newDataFilter
+          .filter((item) => Number(item[filter.columSelect])
+           > Number(filter.filterValue));
+      }
+      if (filter.filterCompare === 'menor que') {
+        newDataFilter = newDataFilter
+          .filter((item) => Number(item[filter.columSelect])
+           < Number(filter.filterValue));
+      }
+      if (filter.filterCompare === 'igual a') {
+        newDataFilter = newDataFilter
+          .filter((item) => Number(item[filter.columSelect])
+           === Number(filter.filterValue));
+      }
+    });
+    setDataFilter([...newDataFilter]);
+  };
+
   return (
     <div>
       <label htmlFor="search">Pesquisar:</label>
@@ -114,6 +138,33 @@ function Table() {
       >
         Aplicar
       </button>
+
+      <button
+        type="button"
+        data-testid="button-remove-filters"
+        onClick={ () => {
+          setFiltersParam([]);
+          setDataFilter([...planetsData]);
+          setOptionsOnSelected(['population', 'orbital_period',
+            'diameter', 'rotation_period', 'surface_water']);
+        } }
+      >
+        Remover Filtros
+      </button>
+
+      {filtersParam.length > 0 && (
+        filtersParam.map((item) => (
+          <section key={ item.columSelect } data-testid="filter">
+            <p>{`${item.columSelect} ${item.filterCompare} ${item.filterValue}`}</p>
+            <button
+              onClick={ () => handleRemoveFilter(item.columSelect) }
+            >
+              <span>&times;</span>
+            </button>
+          </section>
+        ))
+      )}
+
       {planetsData.length === 0 ? <span>carregando...</span> : (
         <table>
           <thead>

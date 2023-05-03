@@ -6,6 +6,9 @@ export const ResidentsContext = createContext();
 export default function ResidentsProvider({ children }) {
   const [planetsData, setPlanetsData] = useState([]);
   const [dataFiltredParam, setdataFiltredParam] = useState([]);
+  const [optionsOnSelected, setOptionsOnSelected] = useState(['population',
+    'orbital_period',
+    'diameter', 'rotation_period', 'surface_water']);
 
   useEffect(() => {
     const dataPanets = async () => {
@@ -23,7 +26,9 @@ export default function ResidentsProvider({ children }) {
     setPlanetsData,
     dataFiltredParam,
     setdataFiltredParam,
-  }), [dataFiltredParam, planetsData]);
+    optionsOnSelected,
+    setOptionsOnSelected,
+  }), [dataFiltredParam, optionsOnSelected, planetsData]);
 
   return (
     <ResidentsContext.Provider value={ context }>

@@ -38,15 +38,21 @@ function Table() {
     setOptionsOnSelected(optionsOnSelected.filter((option) => option !== columSelect));
     switch (filterCompare) {
     case 'maior que':
-      return (setFiltersParam([...filtersParam, { columSelect, filterCompare, filterValue }]),
+      return (setFiltersParam(
+        [...filtersParam, { columSelect, filterCompare, filterValue }]
+      ),
       setDataFilter(dataFilter
         .filter((plan) => Number(plan[columSelect]) > Number(filterValue))));
     case 'menor que':
-      return (setFiltersParam([...filtersParam, { columSelect, filterCompare, filterValue }]),
+      return (setFiltersParam(
+        [...filtersParam, { columSelect, filterCompare, filterValue }]
+      ),
       setDataFilter(dataFilter
         .filter((plan) => Number(plan[columSelect]) < Number(filterValue))));
     case 'igual a':
-      return (setFiltersParam([...filtersParam, { columSelect, filterCompare, filterValue }]),
+      return (setFiltersParam(
+        [...filtersParam, { columSelect, filterCompare, filterValue }]
+      ),
       setDataFilter(dataFilter
         .filter((plan) => Number(plan[columSelect]) === Number(filterValue))));
 

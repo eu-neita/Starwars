@@ -1,9 +1,21 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
+import React, { useContext } from 'react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import App from '../App';
+import { act } from 'react-dom/test-utils';
+import ResidentsProvider, { ResidentsContext } from '../context/residentsContext';
+import Table from '../components/Table';
 
-test('I am your test', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/Hello, App!/i);
-  expect(linkElement).toBeInTheDocument();
+
+
+describe('ResidentsProvider', () => {
+  test('should render children', () => {
+    const { getByText } = render(
+      <ResidentsProvider>
+        <div>Test Children</div>
+      </ResidentsProvider>
+    );
+    expect(getByText('Test Children')).toBeInTheDocument();
+  });
+
 });
+

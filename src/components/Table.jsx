@@ -1,6 +1,10 @@
 import { useContext, useEffect, useState } from 'react';
 import { ResidentsContext } from '../context/residentsContext';
 
+const optionsOnSort = ['population',
+  'orbital_period',
+  'diameter', 'rotation_period', 'surface_water'];
+
 function Table() {
   const { planetsData, optionsOnSelected,
     setOptionsOnSelected } = useContext(ResidentsContext);
@@ -17,9 +21,10 @@ function Table() {
       [name]: value,
     }));
   };
-
+  const [handleSelectOnSort, setHandleSelectOnSort] = useState(optionsOnSort[0]);
   const [dataFilter, setDataFilter] = useState([]);
   const [filtersParam, setFiltersParam] = useState([]);
+  const [sortRadio, setSortRadio] = useState('ASC');
 
   useEffect(() => {
     setDataFilter([...planetsData]);
@@ -66,22 +71,23 @@ function Table() {
     let newDataFilter = [...planetsData];
     removeFilter.forEach((filter) => {
       if (filter.filterCompare === 'maior que') {
-        newDataFilter = newDataFilter
-          .filter((item) => Number(item[filter.columSelect])
+        newDataFilter = newDataFilter.filter((item) => Number(item[filter.columSelect])
            > Number(filter.filterValue));
       }
       if (filter.filterCompare === 'menor que') {
-        newDataFilter = newDataFilter
-          .filter((item) => Number(item[filter.columSelect])
+        newDataFilter = newDataFilter.filter((item) => Number(item[filter.columSelect])
            < Number(filter.filterValue));
       }
       if (filter.filterCompare === 'igual a') {
-        newDataFilter = newDataFilter
-          .filter((item) => Number(item[filter.columSelect])
+        newDataFilter = newDataFilter.filter((item) => Number(item[filter.columSelect])
            === Number(filter.filterValue));
       }
     });
     setDataFilter([...newDataFilter]);
+  };
+
+  const onClickSort = () => {
+    
   };
 
   return (
@@ -152,6 +158,44 @@ function Table() {
         Remover Filtros
       </button>
 
+      <label htmlFor="radio-1">ASC</label>
+      <input
+        type="radio"
+        value="ASC"
+        onChange={ (({ target }) => { setSortRadio(target.value); }) }
+        data-testid="column-sort-input-asc"
+        id="radio-1"
+        name="sort"
+        checked={ sortRadio === 'ASC' }
+      />
+      <label htmlFor="radio-2">DESC</label>
+      <input
+        type="radio"
+        value="DESC"
+        onChange={ (({ target }) => { setSortRadio(target.value); }) }
+        data-testid="column-sort-input-desc"
+        id="radio-2"
+        name="sort"
+        checked={ sortRadio === 'DESC' }
+      />
+
+      <select
+        data-testid="column-sort"
+        onChange={ ({ target }) => { setHandleSelectOnSort(target); } }
+        value={ handleSelectOnSort }
+      >
+        {optionsOnSort.map((value) => (
+          <option key={ value } value={ value }>{ value }</option>
+        ))}
+      </select>
+
+      <button
+        data-testid="column-sort-button"
+        onClick={ onClickSort }
+      >
+        Sort
+      </button>
+
       {filtersParam.length > 0 && (
         filtersParam.map((item) => (
           <section key={ item.columSelect } data-testid="filter">
@@ -189,7 +233,7 @@ function Table() {
               .filter((item) => item.name.toLowerCase().includes(handleInputs.search))
               .map((planet) => (
                 <tr key={ planet.name }>
-                  <td>{planet.name}</td>
+                  <td data-testid="planet-name">{planet.name}</td>
                   <td>{planet.rotation_period}</td>
                   <td>{planet.orbital_period}</td>
                   <td>{planet.diameter}</td>

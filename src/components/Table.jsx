@@ -17,28 +17,36 @@ function Table() {
     }));
   };
   const [dataFilter, setDataFilter] = useState([]);
-  const [columnOption, setColumnOption] = useState(['population', 'orbital_period',
+  const [optionsOnSelected, setOptionsOnSelected] = useState(['population',
+    'orbital_period',
     'diameter', 'rotation_period', 'surface_water']);
-  const [allFilters, setAllFilters] = useState([]);
+  const [filtersParam, setFiltersParam] = useState([]);
 
   useEffect(() => {
     setDataFilter([...planetsData]);
   }, [planetsData]);
 
+  useEffect(() => {
+    setHandle((prev) => ({
+      ...prev,
+      columSelect: optionsOnSelected[0],
+    }));
+  }, [optionsOnSelected]);
+
   const handleOparatorFilter = () => {
     const { filterCompare, columSelect, filterValue } = handleInputs;
-    setColumnOption(columnOption.filter((option) => option !== columSelect));
+    setOptionsOnSelected(optionsOnSelected.filter((option) => option !== columSelect));
     switch (filterCompare) {
     case 'maior que':
-      return (setAllFilters([...allFilters, { columSelect, filterCompare, filterValue }]),
+      return (setFiltersParam([...filtersParam, { columSelect, filterCompare, filterValue }]),
       setDataFilter(dataFilter
         .filter((plan) => Number(plan[columSelect]) > Number(filterValue))));
     case 'menor que':
-      return (setAllFilters([...allFilters, { columSelect, filterCompare, filterValue }]),
+      return (setFiltersParam([...filtersParam, { columSelect, filterCompare, filterValue }]),
       setDataFilter(dataFilter
         .filter((plan) => Number(plan[columSelect]) < Number(filterValue))));
     case 'igual a':
-      return (setAllFilters([...allFilters, { columSelect, filterCompare, filterValue }]),
+      return (setFiltersParam([...filtersParam, { columSelect, filterCompare, filterValue }]),
       setDataFilter(dataFilter
         .filter((plan) => Number(plan[columSelect]) === Number(filterValue))));
 
@@ -66,11 +74,9 @@ function Table() {
         value={ handleInputs.columSelect }
         onChange={ inputChange }
       >
-        <option value="population">population</option>
-        <option value="orbital_period">orbital_period</option>
-        <option value="diameter">diameter</option>
-        <option value="rotation_period">rotation_period</option>
-        <option value="surface_water">surface_water</option>
+        {optionsOnSelected.map((option) => (
+          <option key={ option } value={ option }>{ option }</option>
+        ))}
       </select>
 
       <label htmlFor="valueFilter">Valor:</label>

@@ -121,6 +121,35 @@ describe('ResidentsProvider', () => {
     expect(allPanets.length).toBe(1)
   });
 
+  it('testa consigo usar o sort ASC', () => {
+    render(
+      <ResidentsContext.Provider value={mockContextValue}>
+        <Table />
+      </ResidentsContext.Provider>
+    );
+
+    const aplicarBtnSort = screen.getByTestId('column-sort-button');
+    fireEvent.click(aplicarBtnSort)
+    
+    const allPanets = screen.getAllByTestId('planet-name');
+    expect(allPanets[0]).toHaveTextContent('Tatooine')
+  });
+
+  it('testa consigo usar o sort DESC', () => {
+    render(
+      <ResidentsContext.Provider value={mockContextValue}>
+        <Table />
+      </ResidentsContext.Provider>
+    );
+
+    const aplicarBtnSort = screen.getByTestId('column-sort-button');
+    const desc = screen.getByTestId('column-sort-input-desc');
+    fireEvent.click(desc)
+    fireEvent.click(aplicarBtnSort)
+    const allPanets = screen.getAllByTestId('planet-name');
+    expect(allPanets[0]).toHaveTextContent('Alderaan')
+  });
+
 
 });
 

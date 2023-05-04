@@ -27,7 +27,6 @@ function Table() {
   useEffect(() => {
     setDataFilter([...planetsData]);
   }, [planetsData]);
-
   useEffect(() => {
     setHandle((prev) => ({
       ...prev,
@@ -83,27 +82,38 @@ function Table() {
   };
   const onClickSort = () => {
     let newDataSort = [...planetsData];
+    const magickNumber = -1;
     if (sortRadio === 'ASC') {
-      newDataSort = newDataSort.sort((a, b) => {
-        const valueA = typeof a[handleSelectOnSort]
-        === 'number' ? number(a[handleSelectOnSort]) : -1;
-        const valueB = typeof b[handleSelectOnSort]
-        === 'number' ? number(b[handleSelectOnSort]) : -1;
-        return valueA + valueB;
-      });
+      newDataSort = newDataSort
+        .sort((a, b) => {
+          const numA = Number(a[handleSelectOnSort]);
+          const numB = Number(b[handleSelectOnSort]);
+          if (Number.isNaN(numA)) {
+            return 1;
+          }
+          if (Number.isNaN(numB)) {
+            return magickNumber;
+          }
+          return numA - numB;
+        });
     }
     if (sortRadio === 'DESC') {
-      newDataSort = newDataSort.sort((a, b) => {
-        const valueA = typeof a[handleSelectOnSort]
-        === 'number' ? a[handleSelectOnSort] : -1;
-        const valueB = typeof b[handleSelectOnSort]
-        === 'number' ? b[handleSelectOnSort] : -1;
-        return valueB - valueA;
-      });
+      newDataSort = newDataSort
+        .sort((a, b) => {
+          const numA = Number(a[handleSelectOnSort]);
+          const numB = Number(b[handleSelectOnSort]);
+          if (Number.isNaN(numA)) {
+            return 1;
+          }
+          if (Number.isNaN(numB)) {
+            return magickNumber;
+          }
+          return numB - numA;
+        });
     }
     setDataFilter([...newDataSort]);
-    console.log(newDataSort[handleSelectOnSort]);
   };
+
   return (
     <div>
       <label htmlFor="search">Pesquisar:</label>

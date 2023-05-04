@@ -4,7 +4,6 @@ import { ResidentsContext } from '../context/residentsContext';
 const optionsOnSort = ['population',
   'orbital_period',
   'diameter', 'rotation_period', 'surface_water'];
-
 function Table() {
   const { planetsData, optionsOnSelected,
     setOptionsOnSelected } = useContext(ResidentsContext);
@@ -25,7 +24,6 @@ function Table() {
   const [dataFilter, setDataFilter] = useState([]);
   const [filtersParam, setFiltersParam] = useState([]);
   const [sortRadio, setSortRadio] = useState('ASC');
-
   useEffect(() => {
     setDataFilter([...planetsData]);
   }, [planetsData]);
@@ -36,7 +34,6 @@ function Table() {
       columSelect: optionsOnSelected[0],
     }));
   }, [optionsOnSelected]);
-
   const handleOparatorFilter = () => {
     const { filterCompare, columSelect, filterValue } = handleInputs;
     setOptionsOnSelected(optionsOnSelected.filter((option) => option !== columSelect));
@@ -63,7 +60,6 @@ function Table() {
       break;
     }
   };
-
   const handleRemoveFilter = (column) => {
     const removeFilter = filtersParam.filter((item) => item.columSelect !== column);
     setFiltersParam([...removeFilter]);
@@ -85,11 +81,29 @@ function Table() {
     });
     setDataFilter([...newDataFilter]);
   };
-
   const onClickSort = () => {
-    
+    let newDataSort = [...planetsData];
+    if (sortRadio === 'ASC') {
+      newDataSort = newDataSort.sort((a, b) => {
+        const valueA = typeof a[handleSelectOnSort]
+        === 'number' ? number(a[handleSelectOnSort]) : -1;
+        const valueB = typeof b[handleSelectOnSort]
+        === 'number' ? number(b[handleSelectOnSort]) : -1;
+        return valueA + valueB;
+      });
+    }
+    if (sortRadio === 'DESC') {
+      newDataSort = newDataSort.sort((a, b) => {
+        const valueA = typeof a[handleSelectOnSort]
+        === 'number' ? a[handleSelectOnSort] : -1;
+        const valueB = typeof b[handleSelectOnSort]
+        === 'number' ? b[handleSelectOnSort] : -1;
+        return valueB - valueA;
+      });
+    }
+    setDataFilter([...newDataSort]);
+    console.log(newDataSort[handleSelectOnSort]);
   };
-
   return (
     <div>
       <label htmlFor="search">Pesquisar:</label>
@@ -144,7 +158,6 @@ function Table() {
       >
         Aplicar
       </button>
-
       <button
         type="button"
         data-testid="button-remove-filters"
@@ -157,7 +170,6 @@ function Table() {
       >
         Remover Filtros
       </button>
-
       <label htmlFor="radio-1">ASC</label>
       <input
         type="radio"
@@ -178,24 +190,18 @@ function Table() {
         name="sort"
         checked={ sortRadio === 'DESC' }
       />
-
       <select
         data-testid="column-sort"
-        onChange={ ({ target }) => { setHandleSelectOnSort(target); } }
+        onChange={ ({ target }) => { setHandleSelectOnSort(target.value); } }
         value={ handleSelectOnSort }
       >
         {optionsOnSort.map((value) => (
           <option key={ value } value={ value }>{ value }</option>
         ))}
       </select>
-
-      <button
-        data-testid="column-sort-button"
-        onClick={ onClickSort }
-      >
+      <button data-testid="column-sort-button" onClick={ onClickSort }>
         Sort
       </button>
-
       {filtersParam.length > 0 && (
         filtersParam.map((item) => (
           <section key={ item.columSelect } data-testid="filter">
@@ -208,7 +214,6 @@ function Table() {
           </section>
         ))
       )}
-
       {planetsData.length === 0 ? <span>carregando...</span> : (
         <table>
           <thead>

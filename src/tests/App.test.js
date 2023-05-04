@@ -14,18 +14,6 @@ describe('ResidentsProvider', () => {
     );
     expect(getByText('Test Children')).toBeInTheDocument();
   });
-  test('should table filter by pesquisar', () => {
-    const { getByText } = render(
-      <ResidentsProvider>
-        <Table/>
-      </ResidentsProvider>
-    );
-    waitFor(() => {
-      const allPanets = screen.findAllByTestId('planet-name');
-      expect(allPanets.length).toBe(10)
-    })
-
-  });
   waitFor(() => {
     const inputPesquisar = screen.getByLabelText('Pesquisar:');
     fireEvent.change(inputPesquisar, { target: { value: 's' } });
@@ -101,6 +89,36 @@ describe('ResidentsProvider', () => {
     fireEvent.click(removeBtn)
     const allPanets = screen.getAllByTestId('planet-name');
     expect(allPanets.length).toBe(2)
+  });
+
+
+  it('testa se remove um filtro especifico e se adiciona mais de 1 filtro filtros', () => {
+    render(
+      <ResidentsContext.Provider value={mockContextValue}>
+        <Table />
+      </ResidentsContext.Provider>
+    );
+    const searchInput = screen.getByLabelText('Pesquisar:');
+    expect(searchInput).toBeInTheDocument();
+    const inputColum = screen.getByLabelText('Column:');
+    fireEvent.change(inputColum, { target: { value: 'population' } });
+    const inputValue = screen.getByLabelText('Valor:');
+    fireEvent.change(inputValue, { target: { value: '20000000' } });
+    const inputOperator = screen.getByLabelText('Operador:');
+    fireEvent.change(inputOperator, { target: { value: 'maior que' } });
+    const aplicarBtn = screen.getByTestId('button-filter');
+    fireEvent.click(aplicarBtn)
+    fireEvent.change(inputColum, { target: { value: 'diameter' } });
+    fireEvent.change(inputValue, { target: { value: '0' } });
+    fireEvent.change(inputOperator, { target: { value: 'menor que' } });
+    fireEvent.click(aplicarBtn)
+    
+    const allfilter = screen.getAllByTestId('filter');
+    const removeFilters = screen.getAllByText('×');
+    expect(allfilter.length).toBe(2)
+    fireEvent.click(removeFilters[1])
+    const allPanets = screen.getAllByTestId('planet-name');
+    expect(allPanets.length).toBe(1)
   });
 
 

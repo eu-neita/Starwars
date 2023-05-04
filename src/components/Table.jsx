@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { ResidentsContext } from '../context/residentsContext';
+import setClickSort from '../hook/useClickSort';
 
 const optionsOnSort = ['population',
   'orbital_period',
@@ -80,40 +81,10 @@ function Table() {
     });
     setDataFilter([...newDataFilter]);
   };
-  const onClickSort = () => {
-    let newDataSort = [...planetsData];
-    const magickNumber = -1;
-    if (sortRadio === 'ASC') {
-      newDataSort = newDataSort
-        .sort((a, b) => {
-          const numA = Number(a[handleSelectOnSort]);
-          const numB = Number(b[handleSelectOnSort]);
-          if (Number.isNaN(numA)) {
-            return 1;
-          }
-          if (Number.isNaN(numB)) {
-            return magickNumber;
-          }
-          return numA - numB;
-        });
-    }
-    if (sortRadio === 'DESC') {
-      newDataSort = newDataSort
-        .sort((a, b) => {
-          const numA = Number(a[handleSelectOnSort]);
-          const numB = Number(b[handleSelectOnSort]);
-          if (Number.isNaN(numA)) {
-            return 1;
-          }
-          if (Number.isNaN(numB)) {
-            return magickNumber;
-          }
-          return numB - numA;
-        });
-    }
-    setDataFilter([...newDataSort]);
+  const setSort = () => {
+    const sortedData = setClickSort(planetsData, handleSelectOnSort, sortRadio);
+    setDataFilter(sortedData);
   };
-
   return (
     <div>
       <label htmlFor="search">Pesquisar:</label>
@@ -209,7 +180,10 @@ function Table() {
           <option key={ value } value={ value }>{ value }</option>
         ))}
       </select>
-      <button data-testid="column-sort-button" onClick={ onClickSort }>
+      <button
+        data-testid="column-sort-button"
+        onClick={ setSort }
+      >
         Sort
       </button>
       {filtersParam.length > 0 && (

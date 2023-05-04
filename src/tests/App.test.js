@@ -1,10 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import App from '../App';
-import { act } from 'react-dom/test-utils';
 import ResidentsProvider, { ResidentsContext } from '../context/residentsContext';
 import Table from '../components/Table';
-
+import setClickSort from '../hook/useClickSort';
 
 describe('ResidentsProvider', () => {
   test('should render children', () => {
@@ -68,7 +67,7 @@ describe('ResidentsProvider', () => {
     const optionsOnSort = ['population',
     'orbital_period',
     'diameter', 'rotation_period', 'surface_water'];
-    const optionsOn = ['menor que', 'maior que', 'igual a']
+    const optionsOn = ['menor que', 'maior que', 'igual a'];
     optionsOnSort.map((op) => { 
       const searchInput = screen.getByLabelText('Pesquisar:');
       expect(searchInput).toBeInTheDocument();
@@ -344,8 +343,8 @@ describe('ResidentsProvider', () => {
     optionsOnSort.map((poh) => {
     const aplicarBtnSort = screen.getByTestId('column-sort-button');
     const desc = screen.getByTestId('column-sort-input-desc');
-    fireEvent.click(desc)
-    fireEvent.click(aplicarBtnSort)
+    fireEvent.click(desc);
+    fireEvent.click(aplicarBtnSort);
     const inputColum = screen.getByTestId('column-sort');
     fireEvent.change(inputColum, { target: { value: poh} });
     const allPanets = screen.getAllByTestId('planet-name');
@@ -373,13 +372,11 @@ describe('Testa a página principal', () => {
     render(<App />);
     waitFor(() => {
     const allPanets = screen.findAllByTestId('planet-name');
-    expect(allPanets.length).toBe(10)
+    expect(allPanets.length).toBe(10);
   })
   });
   
 });
-
-import setClickSort from '../hook/useClickSort';
 
 describe('setClickSort function', () => {
   const planetsData = [    { id: 1, name: 'Mercury', distance: '0.39' },    { id: 2, name: 'Venus', distance: '0.72' },    { id: 3, name: 'Earth', distance: '1' },    { id: 4, name: 'Mars', distance: '1.52' },  ];
